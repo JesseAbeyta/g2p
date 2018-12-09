@@ -62,7 +62,21 @@ class Session: # make/remove global session
         g_sess.close()
         g_sess = None
 
+# Dirty hack to get a global session accross multiple modules 
+def make_sess():
+    global g_sess
+    if g_sess != None:
+        raise Exception('Session already exist in g2p')
+    g_sess = tf.Session(graph=g, config=config)
+    saver.restore(g_sess, tf.train.latest_checkpoint(os.path.join(dirname,hp.logdir)))
+    return g_sess
 
+
+def close_sess():
+    global g_sess
+    g_sess.close()
+    g_sess = None
+        
 def predict(words, sess):
     '''
     Returns predicted pronunciation of `words` which do NOT exist in the dictionary.
